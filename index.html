@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+
+    <title>Number guessing game</title>
+
+    <style>
+      html {
+        font-family: sans-serif;
+      }
+
+      body {
+        width: 50%;
+        max-width: 800px;
+        min-width: 480px;
+        margin: 0 auto;
+      }
+      
+      .form input[type="number"] {
+        width: 200px;
+      }
+
+      .lastResult {
+        color: white;
+        padding: 3px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Number guessing game</h1>
+
+    <p>We have selected a random number between 1 and 100. See if you can guess it in 10 turns or fewer. We'll tell you if your guess was too high or too low.</p>
+
+    <div class="form">
+      <label for="guessField">Enter a guess: </label>
+      <input type="number" min="1" max="100" required id="guessField" class="guessField">
+      <input type="submit" value="Submit guess" class="guessSubmit">
+    </div>
+
+    <div class="resultParas">
+      <p class="guesses"></p>
+      <p class="lastResult"></p>
+      <p class="lowOrHi"></p>
+    </div>
+
+    <script>
+        // Your JavaScript goes here
+        let randomNumber = Math.floor(Math.random() * 100) + 1;
+
+        const guesses = document.querySelector('.guesses');
+        const lastResult = document.querySelector('.lastResult');
+        const lowOrHi = document.querySelector('.lowOrHi');
+
+        const guessSubmit = document.querySelector('.guessSubmit');
+        const guessField = document.querySelector('.guessField');
+
+        let guessCount = 1;
+        let resetButton;
+        guessField.focus();
+        function checkGuess() {
+            const userGuess = Number(guessField.value); 
+             /* объявляет переменную с именем userGuess 
+             и устанавливает её значение на то, 
+             что сейчас введено в текстовое поле. 
+             + пропускаем это значение через встроенный метод Number(), 
+             чтобы убедится, что значение точно является числом */
+            if (guessCount === 1) {
+              guesses.textContent = 'Previous guesses: ';
+            }
+            /* В круглые скобки мы добавляем проверку. 
+            Если проверка возвращает true, 
+            запускается код в фигурных скобках. 
+            Если нет, этот код пропускается 
+            и мы переходим к следующей части кода.
+            В этом случае проверяется равна ли 
+            переменная guessCount числу 1 
+            (то есть является ли это первой попыткой игрока или нет) 
+            Если это так, мы выводим параграф с содержанием "Previous guesses: 
+            ". Если нет, ничего не делаем.*/
+            guesses.textContent += userGuess + ' ';
+            /*добавляет текущее значение userGuess в конец параграфа guesses, 
+            плюс пустое пространство поэтому между каждыми 
+            показанными предположениями будет пробел */
+          
+            if (userGuess === randomNumber) {
+              lastResult.textContent = 'Congratulations! You got it right!';
+              lastResult.style.backgroundColor = 'green';
+              lowOrHi.textContent = '';
+              setGameOver();
+            } else if (guessCount === 10) {
+              lastResult.textContent = '!!!GAME OVER!!!';
+              lowOrHi.textContent = '';
+              setGameOver();
+            } else {
+              lastResult.textContent = 'Wrong!';
+              lastResult.style.backgroundColor = 'red';
+              if(userGuess < randomNumber) {
+                lowOrHi.textContent = 'Last guess was too low!';
+              } else if(userGuess > randomNumber) {
+                lowOrHi.textContent = 'Last guess was too high!';
+              }
+            }
+          
+            guessCount++;
+            guessField.value = '';
+            guessField.focus();
+          }
+          /*готовят нас к следующей попытке. 
+          Мы добавляем 1 к переменной guessCount , 
+          так как игрок использовал свой ход 
+          (++ оператор инкремента — увеличивает на 1), 
+          очищаем значение текстового поля 
+          и фокусируемся на нем снова, 
+          готовы для ввода следующего ответа */
+        guessSubmit.addEventListener('click', checkGuess);
+        function setGameOver() {
+            guessField.disabled = true;
+            guessSubmit.disabled = true;
+            /*отключают ввод текста и кнопку формы, 
+            устанавливая их отключённые свойства как true. 
+            Это необходимо, т.к. если бы мы этого не сделали, 
+            то пользователь мог бы представить больше догадок 
+            после завершения игры*/
+            resetButton = document.createElement('button');
+            resetButton.textContent = 'Start new game';
+            document.body.append(resetButton);
+            /*генерируют новый элемент <button>, 
+            устанавливают его текстовую метку «Start new game» 
+            и добавляют её к нижней части нашего HTML*/
+            resetButton.addEventListener('click', resetGame);
+            /* устанавливает обработчик событий на нашей 
+            новой кнопке, так что при нажатии на неё 
+            запускается функция resetGame()*/
+          }
+        function resetGame() {
+            guessCount = 1; /*устанавливает значение guessCount на 1*/
+
+                const resetParas = document.querySelectorAll('.resultParas p');
+                for (const resetPara of resetParas) {
+                 resetPara.textContent = '';
+                } /*удаляет все пункты информации*/
+
+            resetButton.parentNode.removeChild(resetButton);
+            /*удаляет кнопку сброса из нашего кода*/
+            guessField.disabled = false;
+            guessSubmit.disabled = false;
+            guessField.value = '';
+            guessField.focus();
+            /*включает элементы формы, устанавливает фокус, 
+            делает поле доступным для следующих угадываний*/
+            lastResult.style.backgroundColor = 'white';
+            /*удаляет цвет фона из абзаца lastResult*/
+            randomNumber = Math.floor(Math.random() * 100) + 1;
+            /*создаёт новое случайное число, чтобы не угадывал одно и тоже*/
+        }
+    </script>
+  </body>
+</html>
